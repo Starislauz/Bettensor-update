@@ -1,0 +1,5 @@
+{
+  "input_size": 50,
+  "model_type": "KellyFractionNet",
+  "_name_or_path": "mlb_wager_model"
+}
