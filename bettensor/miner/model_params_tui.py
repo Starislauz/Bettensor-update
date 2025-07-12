@@ -59,6 +59,13 @@ class ModelParamsTUI:
             "nfl_kelly_fraction_multiplier": "Sets the multiplier for the fractional kelly criterion.",
             "nfl_edge_threshold": "Sets the minimum betting edge threshold for NFL.",
             "nfl_max_bet_percentage": "Sets the maximum bet percentage of total bankroll for NFL.",
+            "mlb_model_on": "Toggle the MLB model on or off.",
+            "mlb_minimum_wager_amount": "Sets the minimum wager amount for MLB (0-1000).",
+            "mlb_max_wager_amount": "Sets the maximum wager amount for MLB (0-1000).",
+            "mlb_top_n_games": "Sets the number of most confident MLB games to consider.",
+            "mlb_kelly_fraction_multiplier": "Sets the multiplier for the fractional kelly criterion for MLB.",
+            "mlb_edge_threshold": "Sets the minimum betting edge threshold for MLB.",
+            "mlb_max_bet_percentage": "Sets the maximum bet percentage of total bankroll for MLB.",
         }
 
         self.mode = "normal"
@@ -97,7 +104,14 @@ class ModelParamsTUI:
                     nfl_top_n_games INTEGER,
                     nfl_kelly_fraction_multiplier FLOAT,
                     nfl_edge_threshold FLOAT,
-                    nfl_max_bet_percentage FLOAT
+                    nfl_max_bet_percentage FLOAT,
+                    mlb_model_on BOOLEAN,
+                    mlb_minimum_wager_amount FLOAT,
+                    mlb_max_wager_amount FLOAT,
+                    mlb_top_n_games INTEGER,
+                    mlb_kelly_fraction_multiplier FLOAT,
+                    mlb_edge_threshold FLOAT,
+                    mlb_max_bet_percentage FLOAT
                 )
                 """
                 )
@@ -136,7 +150,14 @@ class ModelParamsTUI:
                     nfl_top_n_games = %s,
                     nfl_kelly_fraction_multiplier = %s,
                     nfl_edge_threshold = %s,
-                    nfl_max_bet_percentage = %s
+                    nfl_max_bet_percentage = %s,
+                    mlb_model_on = %s,
+                    mlb_minimum_wager_amount = %s,
+                    mlb_max_wager_amount = %s,
+                    mlb_top_n_games = %s,
+                    mlb_kelly_fraction_multiplier = %s,
+                    mlb_edge_threshold = %s,
+                    mlb_max_bet_percentage = %s
                 WHERE miner_uid = %s
                 """,
                     (
@@ -153,6 +174,13 @@ class ModelParamsTUI:
                         self.params["nfl_kelly_fraction_multiplier"],
                         self.params["nfl_edge_threshold"],
                         self.params["nfl_max_bet_percentage"],
+                        self.params["mlb_model_on"],
+                        self.params["mlb_minimum_wager_amount"],
+                        self.params["mlb_max_wager_amount"],
+                        self.params["mlb_top_n_games"],
+                        self.params["mlb_kelly_fraction_multiplier"],
+                        self.params["mlb_edge_threshold"],
+                        self.params["mlb_max_bet_percentage"],
                         self.miner_id,
                     ),
                 )
@@ -221,7 +249,7 @@ class ModelParamsTUI:
         if self.mode == "normal":
             self.mode = "edit"
             key = list(self.params.keys())[self.cursor_position + 1]
-            if key in ["soccer_model_on", "nfl_model_on"]:
+            if key in ["soccer_model_on", "nfl_model_on", "mlb_model_on"]:
                 self.params[key] = not self.params[key]
                 self.save_params()
                 self.update_view()
@@ -243,7 +271,7 @@ class ModelParamsTUI:
         self.update_view()
 
     def validate_input(self, key, value):
-        if key in ["soccer_model_on", "nfl_model_on"]:
+        if key in ["soccer_model_on", "nfl_model_on", "mlb_model_on"]:
             return value.lower() in ['true', '1', 'yes', 'on']
         try:
             if key == "wager_distribution_steepness":
@@ -256,6 +284,7 @@ class ModelParamsTUI:
                 "fuzzy_match_percentage",
                 "top_n_games",
                 "nfl_top_n_games",
+                "mlb_top_n_games",
             ]:
                 return int(value)
             else:
@@ -278,7 +307,7 @@ class ModelParamsTUI:
                 style = f"reverse {LIGHT_GREEN}" if i - 1 == self.cursor_position else LIGHT_GREEN
                 if self.edit_mode and i - 1 == self.cursor_position:
                     value = f"{self.edit_value}▋"
-                elif key in ["soccer_model_on", "nfl_model_on"]:
+                elif key in ["soccer_model_on", "nfl_model_on", "mlb_model_on"]:
                     value = "On" if value else "Off"
                 table.add_row(key.replace("_", " ").title(), str(value), style=style)
 
@@ -384,6 +413,13 @@ class ModelParamsTUI:
             "nfl_kelly_fraction_multiplier": 1.0,
             "nfl_edge_threshold": 0.02,
             "nfl_max_bet_percentage": 0.7,
+            "mlb_model_on": False,
+            "mlb_minimum_wager_amount": 1.0,
+            "mlb_max_wager_amount": 100.0,
+            "mlb_top_n_games": 5,
+            "mlb_kelly_fraction_multiplier": 1.0,
+            "mlb_edge_threshold": 0.02,
+            "mlb_max_bet_percentage": 0.7,
         }
         with self.db_connect() as conn:
             with conn.cursor() as cur:
